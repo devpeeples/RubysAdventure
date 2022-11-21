@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    public float speed;
+    public float speed = 3.0f;
     public bool vertical;
     public float changeTime = 3.0f;
 
@@ -17,12 +17,17 @@ public class EnemyController : MonoBehaviour
 
     public ParticleSystem smokeEffect;
 
+    private RubyController rubyController;
+
     // Start is called before the first frame update
     void Start()
     {
         rigidbody2D = GetComponent<Rigidbody2D>();
         timer = changeTime;
         animator = GetComponent<Animator>();
+
+        GameObject rubyControllerObject = GameObject.FindWithTag("RubyController");
+        rubyController = rubyControllerObject.GetComponent<RubyController>();
     }
 
     void Update()
@@ -87,6 +92,11 @@ public class EnemyController : MonoBehaviour
         animator.SetTrigger("Fixed");
 
         smokeEffect.Stop();
+
+        if (rubyController != null)
+        {
+            rubyController.FixedRobots(1);
+        }
     }
 }
 

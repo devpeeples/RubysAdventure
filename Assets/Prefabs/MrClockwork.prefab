@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2578129272657131537}
   - component: {fileID: 2582265412991124377}
   - component: {fileID: 9170903258046772802}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: MrClockwork
   m_TagString: Untagged
   m_Icon: {fileID: 0}

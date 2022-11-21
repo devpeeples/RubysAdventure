@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 927395137978348205}
   - component: {fileID: 15970368750293262}
   - component: {fileID: 2574946677347257165}
-  - component: {fileID: 1595729104460131882}
+  - component: {fileID: 1927453263958231987}
   m_Layer: 0
   m_Name: CollectibleHealth
   m_TagString: Untagged
@@ -112,7 +112,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.5735181, y: 0.5450258}
   m_EdgeRadius: 0
---- !u!114 &1595729104460131882
+--- !u!114 &1927453263958231987
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,7 +121,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6451292914862457372}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 403b870380c45ce4083e59ba562a4fb6, type: 3}
+  m_Script: {fileID: 11500000, guid: 84cfab47eda68924d8ed3abafa8337a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   collectedClip: {fileID: 8300000, guid: 1aa901d55d52626449d97fa986b054d2, type: 3}
+  HealthEffect: {fileID: 5802973313810935977, guid: 785c689bdb66ce94d8ddc41c39e8596a,
+    type: 3}

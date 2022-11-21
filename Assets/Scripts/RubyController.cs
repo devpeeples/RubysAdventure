@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
 
 public class RubyController : MonoBehaviour
 {
@@ -23,9 +25,26 @@ public class RubyController : MonoBehaviour
     Vector2 lookDirection = new Vector2(1, 0);
 
     public GameObject projectilePrefab;
+    public int ammo { get { return currentAmmo; }}
+    public int currentAmmo;
 
     public AudioClip cogThrowClip;
     public AudioClip HitPlayer;
+    public AudioSource BackgroundMusic;
+    public AudioClip WinSound;
+    public AudioClip LoseSound;
+
+    public ParticleSystem DamageEffect;
+
+    public TextMeshProUGUI ammoText;
+    public TextMeshProUGUI fixedText;
+    private int scoreFixed = 0;
+    public GameObject WinTextObject;
+    public GameObject LoseTextObject;
+    public GameObject AuthorTextObject;
+    bool gameOver;
+    bool winGame;
+    public static int level = 1;
 
     AudioSource audioSource;
 
@@ -38,6 +57,14 @@ public class RubyController : MonoBehaviour
         currentHealth = maxHealth;
 
         audioSource = GetComponent<AudioSource>();
+
+        fixedText.text = "Robots Fixed: " + scoreFixed.ToString() + "/4";
+
+        WinTextObject.SetActive(false);
+        LoseTextObject.SetActive(false);
+        AuthorTextObject.SetActive(false);
+        gameOver = false;
+        winGame = false;
     }
 
     public void PlaySound(AudioClip clip)
@@ -72,6 +99,12 @@ public class RubyController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C))
         {
             Launch();
+
+            if (currentAmmo > 0)
+            {
+                ChangeAmmo(-1);
+                AmmoText();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.X))
@@ -82,8 +115,31 @@ public class RubyController : MonoBehaviour
                 NonPlayerCharacter character = hit.collider.GetComponent<NonPlayerCharacter>();
                 if (character != null)
                 {
+                    if (scoreFixed >= 4)
+                    {
+                        SceneManager.LoadScene("Level 2");
+                        level = 2;
+                    }
+
+                    else
+                    {
                     character.DisplayDialog();
+                    }
                 }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (gameOver == true)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+
+            if (winGame == true)
+            {
+                SceneManager.LoadScene("Level 1");
+                level = 1;
             }
         }
     }
@@ -109,14 +165,45 @@ public class RubyController : MonoBehaviour
             invincibleTimer = timeInvincible;
 
             audioSource.PlayOneShot(HitPlayer);
+
+            DamageEffect = Instantiate(DamageEffect, rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
+        }
+
+        if (currentHealth == 1)
+        {
+            LoseTextObject.SetActive(true);
+            AuthorTextObject.SetActive(true);
+
+            transform.position = new Vector3(-5f,0f,-100f);
+            speed = 0;
+            Destroy(gameObject.GetComponent<SpriteRenderer>());
+
+            gameOver = true;
+
+            BackgroundMusic.Stop();
+
+            audioSource.PlayOneShot(LoseSound);
         }
 
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         UIHealthBar.instance.SetValue(currentHealth / (float)maxHealth);
+        Debug.Log(currentHealth + "/" + maxHealth);
     }
 
+    public void ChangeAmmo(int amount)
+    {
+        currentAmmo = Mathf.Abs(currentAmmo + amount);
+        Debug.Log("Ammo: " + currentAmmo);
+    }
+
+    public void AmmoText()
+    {
+        ammoText.text = "Cogs: " + currentAmmo.ToString();
+    }
     void Launch()
     {
+        if (currentAmmo > 0)
+        {
         GameObject projectileObject = Instantiate(projectilePrefab, rigidbody2d.position + Vector2.up * 0.5f, Quaternion.identity);
 
         Projectile projectile = projectileObject.GetComponent<Projectile>();
@@ -125,6 +212,38 @@ public class RubyController : MonoBehaviour
         animator.SetTrigger("Launch");
 
         audioSource.PlayOneShot(cogThrowClip);
+        }
+    }
+
+      public void FixedRobots(int amount)
+    {
+        scoreFixed += amount;
+        fixedText.text = "Robots Fixed: " + scoreFixed.ToString() + "/4";
+
+        Debug.Log("Robots Fixed: " + scoreFixed);
+
+        if (scoreFixed == 4 && level == 1)
+        {
+            WinTextObject.SetActive(true);
+        }
+
+        if (scoreFixed == 4 && level == 2)
+        {
+            WinTextObject.SetActive(true);
+            AuthorTextObject.SetActive(true);
+
+            winGame = true;
+
+            transform.position = new Vector3(-5f, 0f, -100f);
+            speed = 0;
+
+            Destroy(gameObject.GetComponent<SpriteRenderer>());
+
+            BackgroundMusic.Stop();
+
+            audioSource.PlayOneShot(WinSound);
+        }
+        
     }
 }
 
