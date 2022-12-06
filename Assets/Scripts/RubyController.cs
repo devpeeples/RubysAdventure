@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class RubyController : MonoBehaviour
 {
-    public float speed = 3.0f;
+    public float speed = 6.0f;
 
     public int maxHealth = 5;
     public float timeInvincible = 2.0f;
@@ -16,6 +16,10 @@ public class RubyController : MonoBehaviour
 
     bool isInvincible;
     float invincibleTimer;
+
+    public float timeBoosting = 4.0f;
+    float speedBoostTimer;
+    bool isBoosting;
 
     Rigidbody2D rigidbody2d;
     float horizontal;
@@ -30,6 +34,9 @@ public class RubyController : MonoBehaviour
 
     public AudioClip cogThrowClip;
     public AudioClip HitPlayer;
+    public AudioClip Jambi;
+    public AudioClip KnightNPC;
+    public AudioClip FoxNPC;
     public AudioSource BackgroundMusic;
     public AudioClip WinSound;
     public AudioClip LoseSound;
@@ -107,6 +114,18 @@ public class RubyController : MonoBehaviour
             }
         }
 
+        if (isBoosting == true)
+        {
+            speedBoostTimer -= Time.deltaTime; // Once speed boost activates, it counts down
+            speed = 8;
+        
+            if (speedBoostTimer < 0)
+            {
+                isBoosting = false;
+                speed = 5; 
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.X))
         {
             RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f, lookDirection, 1.5f, LayerMask.GetMask("NPC"));
@@ -124,7 +143,36 @@ public class RubyController : MonoBehaviour
                     else
                     {
                     character.DisplayDialog();
+                    audioSource.PlayOneShot(Jambi);
                     }
+                }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f, lookDirection, 1.5f, LayerMask.GetMask("NPC"));
+            if (hit.collider != null)
+            {
+                NonPlayerCharacterFox Fox = hit.collider.GetComponent<NonPlayerCharacterFox>();
+                if (Fox != null)
+                {
+                    Fox.DisplayDialog();
+                    audioSource.PlayOneShot(FoxNPC);
+                }
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            RaycastHit2D hit = Physics2D.Raycast(rigidbody2d.position + Vector2.up * 0.2f, lookDirection, 1.5f, LayerMask.GetMask("NPC"));
+            if (hit.collider != null)
+            {
+                NonPlayerCharacterKnight Knight = hit.collider.GetComponent<NonPlayerCharacterKnight>();
+                if (Knight != null)
+                {
+                    Knight.DisplayDialog();
+                    audioSource.PlayOneShot(KnightNPC);
                 }
             }
         }
@@ -173,6 +221,7 @@ public class RubyController : MonoBehaviour
         {
             LoseTextObject.SetActive(true);
             AuthorTextObject.SetActive(true);
+            WinTextObject.SetActive(false);
 
             transform.position = new Vector3(-5f,0f,-100f);
             speed = 0;
@@ -245,5 +294,15 @@ public class RubyController : MonoBehaviour
         }
         
     }
+
+    public void SpeedBoost(int amount)
+    {
+        if (amount > 0)
+        {
+            speedBoostTimer = timeBoosting;
+            isBoosting = true;
+        }
+    }
+    
 }
 

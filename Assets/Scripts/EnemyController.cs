@@ -8,12 +8,16 @@ public class EnemyController : MonoBehaviour
     public bool vertical;
     public float changeTime = 3.0f;
 
+    public AudioClip Fixed;
+
     Rigidbody2D rigidbody2D;
     float timer;
     int direction = 1;
     bool broken = true;
 
     Animator animator;
+
+    AudioSource audioSource;
 
     public ParticleSystem smokeEffect;
 
@@ -25,6 +29,7 @@ public class EnemyController : MonoBehaviour
         rigidbody2D = GetComponent<Rigidbody2D>();
         timer = changeTime;
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         GameObject rubyControllerObject = GameObject.FindWithTag("RubyController");
         rubyController = rubyControllerObject.GetComponent<RubyController>();
@@ -96,6 +101,7 @@ public class EnemyController : MonoBehaviour
         if (rubyController != null)
         {
             rubyController.FixedRobots(1);
+            audioSource.PlayOneShot(Fixed);
         }
     }
 }

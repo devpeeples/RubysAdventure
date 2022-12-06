@@ -6,6 +6,8 @@ public class Cogs : MonoBehaviour
 {
     public AudioClip collectedClip;
 
+    public ParticleSystem CogCollectEffectObject;
+
     void OnTriggerEnter2D(Collider2D other)
     {
         RubyController controller = other.GetComponent<RubyController>();
@@ -16,6 +18,7 @@ public class Cogs : MonoBehaviour
             {
                 controller.ChangeAmmo(4);
                 controller.AmmoText();
+                CogCollectEffectObject = Instantiate(CogCollectEffectObject, transform.position, Quaternion.identity);
                 Destroy(gameObject);
 
                 controller.PlaySound(collectedClip);

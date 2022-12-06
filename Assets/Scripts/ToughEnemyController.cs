@@ -1,0 +1,114 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ToughEnemyController : MonoBehaviour
+{
+    public float speed = 3.0f;
+    public bool vertical;
+    public float changeTime = 3.0f;
+
+    public float Hitpoints;
+    public float MaxHitpoints = 3;
+    public EnemyHealthBar Healthbar;
+
+    public AudioClip Fixed;
+
+    Rigidbody2D rigidbody2D;
+    float timer;
+    int direction = 1;
+    bool broken = true;
+
+    Animator animator;
+
+    AudioSource audioSource;
+
+    public ParticleSystem smokeEffect;
+
+    private RubyController rubyController;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        rigidbody2D = GetComponent<Rigidbody2D>();
+        timer = changeTime;
+        animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+
+        GameObject rubyControllerObject = GameObject.FindWithTag("RubyController");
+        rubyController = rubyControllerObject.GetComponent<RubyController>();
+
+        Hitpoints = MaxHitpoints;
+        Healthbar.SetHealth(Hitpoints,MaxHitpoints);
+    }
+
+    void Update()
+    {
+        //remember ! inverse the test, so if broken is true !broken will be false and return won’t be executed.
+        if (!broken)
+        {
+            return;
+        }
+
+        timer -= Time.deltaTime;
+
+        if (timer < 0)
+        {
+            direction = -direction;
+            timer = changeTime;
+        }
+    }
+
+    void FixedUpdate()
+    {
+        //remember ! inverse the test, so if broken is true !broken will be false and return won’t be executed.
+        if (!broken)
+        {
+            return;
+        }
+
+        Vector2 position = rigidbody2D.position;
+
+        if (vertical)
+        {
+            position.y = position.y + Time.deltaTime * speed * direction;
+            animator.SetFloat("Move X", 0);
+            animator.SetFloat("Move Y", direction);
+        }
+        else
+        {
+            position.x = position.x + Time.deltaTime * speed * direction;
+            animator.SetFloat("Move X", direction);
+            animator.SetFloat("Move Y", 0);
+        }
+
+        rigidbody2D.MovePosition(position);
+    }
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        RubyController player = other.gameObject.GetComponent<RubyController>();
+
+        if (player != null)
+        {
+            player.ChangeHealth(-1);
+        }
+    }
+
+    public void TakeHit(float damage)
+    {
+        Hitpoints -= damage;
+        Healthbar.SetHealth(Hitpoints, MaxHitpoints);
+        
+        if(Hitpoints <= 0)
+        {   
+            broken = false;
+            rigidbody2D.simulated = false;
+            animator.SetTrigger("Fixed");
+            smokeEffect.Stop();
+            rubyController.FixedRobots(1);
+            audioSource.PlayOneShot(Fixed);
+        }
+    }
+}
+
